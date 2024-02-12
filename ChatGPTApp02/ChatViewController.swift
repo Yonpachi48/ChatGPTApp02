@@ -12,7 +12,8 @@ import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
-    let key = "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"
+    
+    let key = API().api
     var diaryFinished: Bool = false
     var inputText = ""
     var imageURL = ""

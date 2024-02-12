@@ -28,6 +28,7 @@
 		E95283372B15AA5400447D42 /* ImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95283362B15AA5400447D42 /* ImageManager.swift */; };
 		E95283392B15BF6800447D42 /* DiaryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95283382B15BF6800447D42 /* DiaryViewController.swift */; };
 		E99268442B1E240C0070FE65 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = E99268432B1E240C0070FE65 /* Message.swift */; };
+		E999169F2B77A56600B5F1DD /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E999169E2B77A56600B5F1DD /* API.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		E95283362B15AA5400447D42 /* ImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageManager.swift; sourceTree = "<group>"; };
 		E95283382B15BF6800447D42 /* DiaryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryViewController.swift; sourceTree = "<group>"; };
 		E99268432B1E240C0070FE65 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		E999169E2B77A56600B5F1DD /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				E92A133E2B032C900010F363 /* Assets.xcassets */,
 				E92A13402B032C900010F363 /* LaunchScreen.storyboard */,
 				E92A13432B032C900010F363 /* Info.plist */,
+				E999169E2B77A56600B5F1DD /* API.swift */,
 			);
 			path = ChatGPTApp02;
 			sourceTree = "<group>";
@@ -228,6 +231,7 @@
 				E95283392B15BF6800447D42 /* DiaryViewController.swift in Sources */,
 				E952832D2B087B7300447D42 /* ImageGeneration.swift in Sources */,
 				E95283292B087B7300447D42 /* EmbeddingsInput.swift in Sources */,
+				E999169F2B77A56600B5F1DD /* API.swift in Sources */,
 				E92A13382B032C8F0010F363 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
