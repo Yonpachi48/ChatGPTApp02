@@ -73,4 +73,4 @@ fastlane/test_output
 iOSInjectionProject/
 
 # API情報
-/ChatGPTApp02/API.swift
+ChatGPTApp02/API.swift
