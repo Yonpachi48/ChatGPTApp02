@@ -21,7 +21,7 @@ class DiaryViewController: UIViewController {
         
         loadImage(from: imageURL)
         
-        diaryLabel.text = diaryText ?? ""
+        diaryLabel.text = diaryText!
         // Do any additional setup after loading the view.
     }
     

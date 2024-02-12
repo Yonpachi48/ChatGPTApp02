@@ -12,17 +12,21 @@ import InputBarAccessoryView
 
 class ChatViewController: MessagesViewController {
     
-    
+    // OpenAIのAPIキー
     let key = API().api
+    
+    // 会話終了かどうかを表す値
     var diaryFinished: Bool = false
+    
     var inputText = ""
     var imageURL = ""
     var diaryText = ""
+    
+    // ChatGPTに投げる時の会話記録
     var chatMessages : [ChatMessage] = []
     
-    // メッセージリスト
+    // チャット表示させるための会話記録
     private var messageList: [Message] = [] {
-        // メッセージ設定時に呼ばれる
         didSet {
             messagesCollectionView.reloadData()
             messagesCollectionView.scrollToLastItem(at: .bottom, animated: true)
@@ -34,6 +38,7 @@ class ChatViewController: MessagesViewController {
         super.viewDidLoad()
         
         setupGPT()
+        
         messagesCollectionView.backgroundColor = UIColor.secondarySystemBackground
         messagesCollectionView.messagesDataSource = self
         messagesCollectionView.messagesLayoutDelegate = self
@@ -56,26 +61,33 @@ class ChatViewController: MessagesViewController {
         }
     }
     
+    
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        print("promptText: \(imageURL)")
-        print("diaryText: \(diaryText)")
         if segue.identifier == "toDiaryVC" {
             let next = segue.destination as? DiaryViewController
             next?.imageURL = self.imageURL
-            next?.diaryText = "\(String(describing: self.chatMessages[chatMessages.count-2].content))"
+            next?.diaryText = diaryText
         }
     }
-
     
+    /*
+     chatGPTに会話を投げかけるメソッド
+     resut: chatGPTからの返答
+     
+     */
     private func generatedAnswer(from chatMessages: [ChatMessage]) async throws -> String {
         let openAI = OpenAISwift(config: OpenAISwift.Config.makeDefaultOpenAI(apiKey: key))
         let result = try await openAI.sendChat(with: chatMessages, model: .gpt4(.gpt4))
         self.chatMessages.append(ChatMessage(role: .assistant, content: result.choices?.first?.message.content ?? ""))
         
+        // 会話が終了した時は、画像生成のプロンプトを出力させて、画像生成を行い、画面遷移。
         if diaryFinished {
+            diaryText = result.choices?.first?.message.content ?? ""
             self.chatMessages.append(ChatMessage(role: .user, content: "画像を生成してください"))
             let promptResult = try await openAI.sendChat(with: chatMessages, model: .gpt4(.gpt4))
             messageList.append(Message.new(sender: ChatSender.other, message: "画像生成中です。"))
+            // 生成された画像のURL
             self.imageURL = await genarateImage(from: promptResult.choices?.first?.message.content ?? "")
             self.performSegue(withIdentifier: "toDiaryVC", sender: self)
         } else {
@@ -89,9 +101,15 @@ class ChatViewController: MessagesViewController {
         return result.choices?.first?.message.content ?? ""
     }
     
+    /*
+     ・画像生成を行うメソッド
+     ・プロンプト分を引数にする
+     ・生成された画像のURLを返す
+     */
     private func genarateImage(from promptMessage: String) async -> String{
         let openAI = OpenAISwift(config: OpenAISwift.Config.makeDefaultOpenAI(apiKey: key))
         do {
+            // プロンプト分に以下の内容を加えるとアニメ調でファンタジーな感じになる
             let success = try await openAI.sendImages(with: "\(promptMessage), 4K Anime, --niji 5, like a dream world, fantasy", numImages: 1, size: .size1024)
             return success.data?.first?.url ?? ""
         } catch {
@@ -100,11 +118,17 @@ class ChatViewController: MessagesViewController {
         }
     }
     
+    /*
+     ・ChatGPTに初期条件を与えるメソッド
+     ・.systemが前提条件を入力する役割を担う→この文章が超重要
+     */
     private func setupGPT() {
         Task {
             do {
                 chatMessages = [
-                    ChatMessage(role: .system, content: "前提：あなたには以下の手順に沿って夢(寝ている時に見る情景)にまつわる絵日記の作成を手伝っていただきます。手順1： 私が夢の内容(文章)を送りますので、その日記から画像を生成するためのプロンプトを英語で生成してください。手順2： また、画像生成に必要なプロンプトが不足する場合は必要な情報を聞いてください。(ユーザーのイメージに限りなく近い画像を生成することを心がけてください。)手順3： 必要な情報が揃ったら、出てきた情報のまとめを日記の形(100文字以内)で出力してください。手順4：私が”OK” と返したら先ほどまとめた日記のみを返してください。(絶対に日記以外の要素を含まないでください。)手順5： 私が”画像を生成してください”と返したら画像生成に用いる英語のプロンプトのみを返してください。(絶対にプロンプト以外の要素を含まないでください。)")
+                    ChatMessage(role: .system, content:
+                                    "前提：あなたには以下の条件に沿って夢(寝ている時に見る情景)にまつわる絵日記の作成を手伝っていただきます。条件1： 私が夢の内容(文章)を送りますので、その日記から画像を生成するためのプロンプトを英語で生成してください。条件2： また、画像生成に必要なプロンプトが不足する場合は必要な情報を聞いてください。(私のイメージに限りなく近い画像を生成することを心がけてください。)条件3： 必要な情報が揃ったら、出てきた情報のまとめを日記の形(200文字以内)で出力してください。条件4：私が”OK” と返したら先ほどまとめた日記のみを返してください。(絶対に日記以外の要素を含まないでください。)条件5： 私が”画像を生成してください”と返したら画像生成に用いる英語のプロンプトのみを返してください。(絶対にプロンプト以外の要素を含まないでください。)条件6：英語のプロンプト文章ではなく、より精密な画像を作るためのプロンプトにしてください。"
+                               )
                 ]
                 let answer = try await generatedAnswer(from: chatMessages)
                 print(answer)
